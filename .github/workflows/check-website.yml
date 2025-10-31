@@ -1,0 +1,33 @@
+name: 檢查實驗室網站狀態
+
+on:
+  schedule:
+    # 每 8 小時執行一次 (UTC 時間)
+    # 格式: cron(分 時 日 月 星期)
+    # 範例: 每天 00:00, 08:00, 16:00 (UTC) 執行
+    - cron: '0 */8 * * *'
+  workflow_dispatch: # 允許手動觸發
+
+jobs:
+  check-website:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 檢出代碼
+        uses: actions/checkout@v4
+
+      - name: 設定 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 安裝依賴
+        run: npm ci
+
+      - name: 檢查網站狀態並發送通知
+        env:
+          TARGET_URL: ${{ secrets.TARGET_URL }}
+          CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+        run: node check-website.js
