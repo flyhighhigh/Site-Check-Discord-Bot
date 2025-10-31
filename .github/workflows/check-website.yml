@@ -2,10 +2,10 @@ name: 網站健康檢查
 
 on:
   schedule:
-    # 每 8 小時執行一次 (UTC 時間)
+    # 每 1 小時執行一次 (UTC 時間)
     # 格式: cron(分 時 日 月 星期)
     # 範例: 每天 00:00, 08:00, 16:00 (UTC) 執行
-    - cron: '0 */8 * * *'
+    - cron: '0 */1 * * *'
   workflow_dispatch: # 允許手動觸發
 
 jobs:
