@@ -15,7 +15,7 @@ async function pingWebsite() {
     const response = await fetch(TARGET_URL, {
       method: 'GET',
       headers: {
-        'User-Agent': 'Lab-Monitor-Bot/1.0'
+        'User-Agent': 'Website-Health-Check-Bot/1.0'
       },
       signal: controller.signal
     });
@@ -79,7 +79,7 @@ async function sendAlert(failureResults) {
 
     const channel = await client.channels.fetch(CHANNEL_ID);
     if (channel && channel.isTextBased()) {
-      await channel.send('實驗室網站掛了');
+      await channel.send(`網站掛了：${TARGET_URL}`);
       console.log(`[${new Date().toLocaleString('zh-TW')}] 已發送警告訊息到頻道`);
     } else {
       console.error('無法取得指定的頻道或頻道類型錯誤');

@@ -1,4 +1,4 @@
-name: 檢查實驗室網站狀態
+name: 網站健康檢查
 
 on:
   schedule:

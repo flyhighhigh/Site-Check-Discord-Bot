@@ -23,14 +23,19 @@ const ALERT_COOLDOWN = 5 * 60 * 1000; // 5 分鐘內不重複發送警告
 
 // 檢查網站狀態
 async function checkWebsite() {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 秒超時
+
   try {
     const response = await fetch(TARGET_URL, {
       method: 'GET',
       headers: {
-        'User-Agent': 'Lab-Monitor-Bot/1.0'
+        'User-Agent': 'Website-Health-Check-Bot/1.0'
       },
-      timeout: 10000 // 10 秒超時
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
 
     if (response.ok) {
       // 網站正常，重置失敗計數
@@ -46,9 +51,14 @@ async function checkWebsite() {
       return false;
     }
   } catch (error) {
+    clearTimeout(timeoutId);
     // 連線失敗或超時
     failureCount++;
-    console.log(`[${new Date().toLocaleString('zh-TW')}] 網站連線失敗: ${error.message}, 失敗次數: ${failureCount}`);
+    if (error.name === 'AbortError') {
+      console.log(`[${new Date().toLocaleString('zh-TW')}] 網站連線超時, 失敗次數: ${failureCount}`);
+    } else {
+      console.log(`[${new Date().toLocaleString('zh-TW')}] 網站連線失敗: ${error.message}, 失敗次數: ${failureCount}`);
+    }
     return false;
   }
 }
@@ -66,7 +76,7 @@ async function sendAlert() {
   try {
     const channel = await client.channels.fetch(CHANNEL_ID);
     if (channel && channel.isTextBased()) {
-      await channel.send('實驗室網站掛了');
+      await channel.send(`網站掛了：${TARGET_URL}`);
       lastAlertTime = now;
       console.log(`[${new Date().toLocaleString('zh-TW')}] 已發送警告訊息到頻道`);
     } else {
