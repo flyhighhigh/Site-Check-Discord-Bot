@@ -1,4 +1,7 @@
 import fetch from 'node-fetch';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const TARGET_URL = process.env.TARGET_URL;
 const WEBHOOK_URL = process.env.WEBHOOK_URL;
