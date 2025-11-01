@@ -70,28 +70,47 @@ async function sendAlert(failureResults) {
   });
 
   try {
+    console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 開始登入 Discord Bot...`);
     await client.login(DISCORD_TOKEN);
-    
+    console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 登入呼叫完成，等待 ready 事件...`);
+  
     // 等待 Bot 準備就緒
     await new Promise((resolve) => {
-      client.once('ready', resolve);
+      client.once('ready', () => {
+        console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] Bot 已觸發 ready 事件`);
+        resolve();
+      });
     });
-
+  
+    console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 嘗試抓取頻道: ${CHANNEL_ID}`);
     const channel = await client.channels.fetch(CHANNEL_ID);
+    console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 頻道抓取結果: ${channel ? channel.id : 'null'}`);
+  
     if (channel && channel.isTextBased()) {
+      console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 開始發送訊息到頻道...`);
       await channel.send(`網站掛了：${TARGET_URL}`);
-      console.log(`[${new Date().toLocaleString('zh-TW')}] 已發送警告訊息到頻道`);
+      console.log(`[${new Date().toLocaleString('zh-TW')}] 已成功發送警告訊息到頻道`);
     } else {
-      console.error('無法取得指定的頻道或頻道類型錯誤');
+      console.error(`[${new Date().toLocaleString('zh-TW')}] [ERROR] 無法取得指定頻道或頻道類型錯誤`);
       process.exit(1);
     }
-
-    // 關閉客戶端
+  
+    console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 嘗試銷毀 Discord Client...`);
     await client.destroy();
+    console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] Discord Client 已銷毀`);
+  
+    // 為防止 event loop 卡住，強制退出
+    console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 準備結束程式...`);
+    setTimeout(() => {
+      console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 強制結束防止掛住`);
+      process.exit(0);
+    }, 3000);
+  
   } catch (error) {
-    console.error(`發送訊息時發生錯誤: ${error.message}`);
+    console.error(`[${new Date().toLocaleString('zh-TW')}] [ERROR] 發送訊息時發生錯誤: ${error.stack || error.message}`);
     process.exit(1);
   }
+
 }
 
 // 主程式
