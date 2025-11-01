@@ -1,9 +1,7 @@
-import { Client, GatewayIntentBits } from 'discord.js';
 import fetch from 'node-fetch';
 
 const TARGET_URL = process.env.TARGET_URL;
-const CHANNEL_ID = process.env.CHANNEL_ID;
-const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
+const WEBHOOK_URL = process.env.WEBHOOK_URL;
 const PING_COUNT = 3; // 固定 ping 3 次
 
 // 單次檢查網站
@@ -60,64 +58,37 @@ async function checkMultipleTimes() {
   return results;
 }
 
-// 發送警告訊息到 Discord
+// 發送警告訊息到 Discord Webhook
 async function sendAlert(failureResults) {
-  const client = new Client({
-    intents: [
-      GatewayIntentBits.Guilds,
-      GatewayIntentBits.GuildMessages,
-    ]
-  });
-
   try {
-    console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 開始登入 Discord Bot...`);
-    await client.login(DISCORD_TOKEN);
-    console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 登入呼叫完成，等待 ready 事件...`);
-  
-    // 等待 Bot 準備就緒
-    await new Promise((resolve) => {
-      client.once('ready', () => {
-        console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] Bot 已觸發 ready 事件`);
-        resolve();
-      });
+    const response = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        content: `網站掛了：${TARGET_URL}`,
+      }),
     });
-  
-    console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 嘗試抓取頻道: ${CHANNEL_ID}`);
-    const channel = await client.channels.fetch(CHANNEL_ID);
-    console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 頻道抓取結果: ${channel ? channel.id : 'null'}`);
-  
-    if (channel && channel.isTextBased()) {
-      console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 開始發送訊息到頻道...`);
-      await channel.send(`網站掛了：${TARGET_URL}`);
-      console.log(`[${new Date().toLocaleString('zh-TW')}] 已成功發送警告訊息到頻道`);
+
+    if (response.ok) {
+      console.log(`[${new Date().toLocaleString('zh-TW')}] 已發送警告訊息到 Discord Webhook`);
     } else {
-      console.error(`[${new Date().toLocaleString('zh-TW')}] [ERROR] 無法取得指定頻道或頻道類型錯誤`);
+      const errorText = await response.text();
+      console.error(`發送訊息失敗: HTTP ${response.status} - ${errorText}`);
       process.exit(1);
     }
-  
-    console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 嘗試銷毀 Discord Client...`);
-    await client.destroy();
-    console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] Discord Client 已銷毀`);
-  
-    // 為防止 event loop 卡住，強制退出
-    console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 準備結束程式...`);
-    setTimeout(() => {
-      console.log(`[${new Date().toLocaleString('zh-TW')}] [DEBUG] 強制結束防止掛住`);
-      process.exit(0);
-    }, 3000);
-  
   } catch (error) {
-    console.error(`[${new Date().toLocaleString('zh-TW')}] [ERROR] 發送訊息時發生錯誤: ${error.stack || error.message}`);
+    console.error(`發送訊息時發生錯誤: ${error.message}`);
     process.exit(1);
   }
-
 }
 
 // 主程式
 async function main() {
   // 驗證環境變數
-  if (!TARGET_URL || !CHANNEL_ID || !DISCORD_TOKEN) {
-    console.error('錯誤: 請設定 TARGET_URL、CHANNEL_ID 和 DISCORD_TOKEN 環境變數');
+  if (!TARGET_URL || !WEBHOOK_URL) {
+    console.error('錯誤: 請設定 TARGET_URL 和 WEBHOOK_URL 環境變數');
     process.exit(1);
   }
 

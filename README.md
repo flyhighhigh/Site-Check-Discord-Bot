@@ -1,6 +1,6 @@
 # 網站健康檢查工具
 
-這是一個簡易的網站健康檢查工具，使用 Discord Bot 作為通知機制。當監控的網站連續無回應達到設定次數時，會自動發送警告訊息到指定的 Discord 頻道。
+這是一個簡易的網站健康檢查工具，使用 Discord Webhook 作為通知機制。當監控的網站連續無回應達到設定次數時，會自動發送警告訊息到指定的 Discord 頻道。
 
 ## 功能
 
@@ -20,29 +20,16 @@
 2. **設定環境變數**
    - 複製 `.env.example` 為 `.env`
    - 填入必要的設定值：
-     - `DISCORD_TOKEN`: Discord Bot Token（從 [Discord Developer Portal](https://discord.com/developers/applications) 取得）
+     - `WEBHOOK_URL`: Discord Webhook URL（從 Discord 頻道設定中取得）
      - `TARGET_URL`: 要監控的網站 URL
-     - `CHANNEL_ID`: 要發送訊息的 Discord 頻道 ID
      - `MAX_FAILURE_COUNT`: 允許連續失敗的次數（預設：3）
      - `CHECK_INTERVAL`: 檢查間隔時間，單位為毫秒（預設：60000，即 60 秒）
 
-3. **取得 Discord Bot Token**
-   - 前往 [Discord Developer Portal](https://discord.com/developers/applications)
-   - 建立新的 Application 或選擇現有的
-   - 進入 Bot 頁籤，建立 Bot 並複製 Token
-   - 確保開啟以下權限：
-     - Send Messages
-     - Read Message History
-     - View Channels
-
-4. **取得頻道 ID**
-   - 在 Discord 中啟用「開發者模式」
-   - 右鍵點擊目標頻道 → 複製 ID
-
-5. **邀請 Bot 到伺服器**
-   - 在 Developer Portal 的 OAuth2 → URL Generator
-   - 選擇 `bot` scope 和所需的權限
-   - 使用生成的 URL 邀請 Bot
+3. **取得 Discord Webhook URL**
+   - 在 Discord 中進入要接收通知的頻道
+   - 點擊頻道名稱 → `編輯頻道` → `整合` → `Webhooks`
+   - 點擊 `建立 Webhook` 或選擇現有的 Webhook
+   - 複製 `Webhook URL`
 
 ## 使用方法
 
@@ -60,9 +47,8 @@ npm run dev
 
 | 變數名稱 | 說明 | 預設值 | 必填 |
 |---------|------|--------|------|
-| `DISCORD_TOKEN` | Discord Bot Token | - | ✓ |
+| `WEBHOOK_URL` | Discord Webhook URL | - | ✓ |
 | `TARGET_URL` | 要監控的網站 URL | - | ✓ |
-| `CHANNEL_ID` | Discord 頻道 ID | - | ✓ |
 | `MAX_FAILURE_COUNT` | 最大連續失敗次數 | 3 | ✗ |
 | `CHECK_INTERVAL` | 檢查間隔（毫秒） | 60000 | ✗ |
 
@@ -78,9 +64,8 @@ npm run dev
    - 進入你的 GitHub Repository
    - 點擊 `Settings` → `Secrets and variables` → `Actions`
    - 新增以下 Secrets：
-     - `DISCORD_TOKEN`: Discord Bot Token
+     - `WEBHOOK_URL`: Discord Webhook URL
      - `TARGET_URL`: 要監控的網站 URL
-     - `CHANNEL_ID`: Discord 頻道 ID
 
 3. **Workflow 設定**
    - Workflow 檔案已位於 `.github/workflows/check-website.yml`
