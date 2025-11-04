@@ -4,11 +4,7 @@
 
 ## 功能
 
-- 定期檢查網站狀態
-- 追蹤連續失敗次數
-- 當失敗次數超過閾值時發送警告訊息
-- 避免短時間內重複發送警告（冷卻機制）
-- **GitHub Actions 整合**：每 8 小時自動檢查一次（可選）
+- GitHub Actions 每 1 小時自動檢查一次
 
 ## 安裝步驟
 
@@ -47,12 +43,12 @@ npm run dev
 
 | 變數名稱 | 說明 | 預設值 | 必填 |
 |---------|------|--------|------|
-| `WEBHOOK_URL` | Discord Webhook URL | - | ✓ |
-| `TARGET_URL` | 要監控的網站 URL | - | ✓ |
-| `MAX_FAILURE_COUNT` | 最大連續失敗次數 | 3 | ✗ |
-| `CHECK_INTERVAL` | 檢查間隔（毫秒） | 60000 | ✗ |
+| `WEBHOOK_URL` | Discord Webhook URL | - | V |
+| `TARGET_URL` | 要監控的網站 URL | - | V |
+| `MAX_FAILURE_COUNT` | 最大連續失敗次數 | 3 | X |
+| `CHECK_INTERVAL` | 檢查間隔（毫秒） | 60000 | X |
 
-## GitHub Actions 自動檢查（可選）
+## GitHub Actions 自動檢查
 
 除了本地運行的 Bot 外，也可以使用 GitHub Actions 進行定期檢查。
 
